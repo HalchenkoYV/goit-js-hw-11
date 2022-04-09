@@ -1,13 +1,11 @@
 import './sass/main.scss';
 import "simplelightbox/dist/simple-lightbox.min.css";
 import Notiflix from 'notiflix';
-import SimpleLightbox from 'simplelightbox';
+// import SimpleLightbox from 'simplelightbox'; // Немогу поставить, пишет: Could not find a declaration file for module 'simplelightbox'. 'C:/Users/Egor/Desktop/GoIT/goit-js-hw-11/node_modules/simplelightbox/dist/simple-lightbox.js' implicitly has an 'any' type. Try `npm i --save-dev @types/simplelightbox` if it exists or add a new declaration (.d.ts) file containing `declare module 'simplelightbox';`
 import PicturesService from './js/pictures-service';
 import LoadMoreBtn from './js/loadMoreBtn';
 import picturesTpl from './pictures-cards.hbs';
 
-// let gallery = new SimpleLightbox('.gallery a');
-// gallery.refresh(); // Next Image
 var lightbox = new SimpleLightbox('.gallery a', { captionsData:'alt', captionDelay:250 });
 
 const refs = {
@@ -24,10 +22,12 @@ const picturesService = new PicturesService();
 
 let numberCurPic = 0;
 
-refs.searchForm.addEventListener('submit', onSearch);             ///// search articles
-refs.btnLoadMore.addEventListener('click', fetchPictures);        ///// load more 
+refs.searchForm.addEventListener('submit', onSearch);             
+refs.btnLoadMore.addEventListener('click', fetchPictures);
+refs.conteinerForContent.addEventListener('click', function (e) { e.preventDefault(); });
 
-// ///////////////////     SEARCH ARTICLES FIRST REQUEST    /////////////////////////
+
+// ///////////////////     SEARCH Pictures FIRST REQUEST    /////////////////////////
 function onSearch(e) {
     e.preventDefault();
     console.log(e.currentTarget);
@@ -43,9 +43,9 @@ function onSearch(e) {
   numberCurPic = 0;
   clearArticlesContainer(); 
   
-  ///fetch
   fetchPictures()
-    .then((e) => {
+    .then(() => {
+      
       if (picturesService.totalMatches != 0) {
       Notiflix.Notify.success(`Hooray! We found ${picturesService.totalMatches} images`);
       }
@@ -56,7 +56,7 @@ function onSearch(e) {
     
 }
 
-// ///////////////////////////     LOAD MORE    /////////////////////////////////
+/////////////////////////////     LOAD MORE    /////////////////////////////////
 async function fetchPictures() {
   await picturesService.fetchPictures()
     .then(pictures => {
@@ -73,6 +73,7 @@ async function fetchPictures() {
       if (picturesService.totalMatches != 0) {
         loadMoreBtn.show();
       }
+      lightbox.refresh()
     })
     
 }
